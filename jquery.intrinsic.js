@@ -38,14 +38,35 @@
     var element = this instanceof jQuery ? this[0] : this;
     var measurement;
 
-    // Use jQuery’s internal swap() method to temporarily apply the styles, then
-    // measure the element’s width() or height().
-    $.swap(document.body, tempBodyCSS, function () {
-      $.swap(element, tempElementCSS, function () {
+    // Temporarily apply the styles, then measure the element’s width() or height().
+    swap(document.body, tempBodyCSS, function () {
+      swap(element, tempElementCSS, function () {
         measurement = $(element)[dimension]();
       });
     });
 
     return measurement;
   };
+
+  // A method for quickly swapping in/out CSS properties to get correct calculations.
+  function swap( elem, options, callback, args ) {
+    var ret, name,
+      old = {};
+
+    // Remember the old values, and insert the new ones
+    for ( name in options ) {
+      old[ name ] = elem.style[ name ];
+      elem.style[ name ] = options[ name ];
+    }
+
+    ret = callback.apply( elem, args || [] );
+
+    // Revert the old values
+    for ( name in options ) {
+      elem.style[ name ] = old[ name ];
+    }
+
+    return ret;
+  }
+
 })(jQuery);
